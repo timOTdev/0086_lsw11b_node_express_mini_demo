@@ -1,5 +1,6 @@
 // require the express npm module, needs to be added to the project using "yarn add" or "npm install"
 const express = require('express');
+const users = require('./data/db.js')
 
 // creates an express application using the express module
 const server = express();
@@ -27,6 +28,12 @@ server.get('/hobbits', (req, res) => {
   ];
   res.status(200).json(hobbits);
 });
+
+server.get('/users', (req, res) => {
+  users.find()
+    .then(data => res.send(data))
+    .catch(err => console.log(err))
+})
 
 // once the server is fully configured we can have it "listen" for connections on a particular "port"
 // the callback function passed as the second argument will run once when the server starts
