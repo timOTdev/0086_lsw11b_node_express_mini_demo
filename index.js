@@ -15,6 +15,7 @@ server.get('/', (req, res) => {
   res.send('Hello World');
 });
 
+// HOBBITS ROUTES
 const hobbits = [
   {
     id: 1,
@@ -26,7 +27,6 @@ const hobbits = [
   },
 ];
 
-// ROUTE /hobbits
 server.get('/hobbits', (req, res) => {
   const sortField = req.query.sortby || 'id';
 
@@ -47,8 +47,14 @@ server.post('/hobbits', (req, res) => {
   res.status(201).json(hobbits);
 }) // 201 means created
 
-server.put('/hobbits', (req, res) => {
-  res.status(200).json({ url: '/hobbits', operation: 'PUT' });
+server.put('/hobbits/:id', (req, res) => {
+  const hobbit = hobbits.find(hobbit => hobbit.id == req.params.id);
+  if (!hobbit) {
+    res.status(404).json({ message: 'Hobbit does not exist' });
+  } else {
+    Object.assign(hobbit, req.body);
+    res.status(200).json(hobbit);
+  }
 }) // 200 means okay
 
 server.delete('/hobbits/:id', (req, res) => {
@@ -61,12 +67,12 @@ server.delete('/hobbits/:id', (req, res) => {
     res.redirect('/hobbits')
 }) // 204 means no content
 
-// ROUTE /users
+// USERS ROUTES
 server.get('/users', (req, res) => {
   users.find()
     .then(users => {
       console.log('\n** users**', users);
-      res.json(users);
+      res.status(200).json(users);
     })
     .catch(err => console.log(err))
 })
