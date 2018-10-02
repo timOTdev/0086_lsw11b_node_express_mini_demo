@@ -4,6 +4,7 @@ const users = require('./data/db.js');
 
 // creates an express application using the express module
 const server = express();
+server.use(express.json());
 
 // configures our server to execute a function for every GET request to "/"
 // the second argument passed to the .get() method is the "Route Handler Function"
@@ -14,21 +15,21 @@ server.get('/', (req, res) => {
   res.send('Hello World');
 });
 
+const hobbits = [
+  {
+    id: 1,
+    name: 'Samwise Gamgee',
+  },
+  {
+    id: 2,
+    name: 'Frodo Baggins',
+  },
+];
+
 // ROUTE /hobbits
 server.get('/hobbits', (req, res) => {
-  // route handler code here
-  const hobbits = [
-    {
-      id: 1,
-      name: 'Samwise Gamgee',
-    },
-    {
-      id: 2,
-      name: 'Frodo Baggins',
-    },
-  ];
   const sortField = req.query.sortby || 'id';
-  
+
   const response = hobbits.sort(
     (a, b) => (a[sortField] < b[sortField] ? -1 : 1)
   );
@@ -37,7 +38,13 @@ server.get('/hobbits', (req, res) => {
 });
 
 server.post('/hobbits', (req, res) => {
-  res.status(201).json({ url: '/hobbits', operation: 'POST' });
+  const hobbit = req.body;
+  let nextId = 3;
+  hobbit.id = nextId++;
+
+  hobbits.push(hobbit)
+
+  res.status(201).json(hobbits);
 }) // 201 means created
 
 server.put('/hobbits', (req, res) => {
@@ -46,7 +53,6 @@ server.put('/hobbits', (req, res) => {
 
 server.delete('/hobbits/:id', (req, res) => {
   const { id } = req.params
-
   res.status(204)
     .json({
       url: `/hobbits/${id}`,
