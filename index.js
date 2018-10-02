@@ -27,8 +27,13 @@ server.get('/hobbits', (req, res) => {
       name: 'Frodo Baggins',
     },
   ];
+  const sortField = req.query.sortby || 'id';
   
-  res.status(200).json(hobbits);
+  const response = hobbits.sort(
+    (a, b) => (a[sortField] < b[sortField] ? -1 : 1)
+  );
+  
+  res.status(200).json(response);
 });
 
 server.post('/hobbits', (req, res) => {
