@@ -57,15 +57,6 @@ server.put('/hobbits/:id', (req, res) => {
   };
 });
 
-// server.delete('/hobbits/:id', (req, res) => {
-//   const id = req.params.id;
-//   res.status(200).json({
-//       url: `/hobbits/${id}`,
-//       operation: `DELETE for hobbit with id ${id}`
-//     });
-//     // res.redirect('/hobbits');
-// });
-
 server.delete('/hobbits/:id', (req, res) => {
   const id = req.params.id;
   // or we could destructure it like so: const { id } = req.params;
@@ -83,7 +74,31 @@ server.delete('/hobbits/:id', (req, res) => {
 });
 
 // USERS ROUTES
-server.get('/users', (req, res) => {
+server.post('/api/users', (req, res) => {
+  const { name, bio } = req.body;
+  const newUser = { name, bio };
+  if (!name || !bio) {
+    return res
+      .status(400)
+      .json({ errorMessage: "Please provide name and bio for the user." });
+  }
+  db.insert(newUser)
+    .then(userId => {
+      const { id } = userId;
+      db.findById(id).then(user => {
+        console.log(user);
+        if (!user) {
+          return res
+            .status(422)
+            .send({ Error: `User does not exist by that id ${id}` });
+        }
+        res.status(201).json(user);
+      });
+    })
+    .catch(err => console.error(err));
+});
+
+server.get('/api/users', (req, res) => {
   users.find()
     .then(users => {
       console.log('\n** users**', users);
@@ -91,6 +106,37 @@ server.get('/users', (req, res) => {
     })
     .catch(err => console.log(err));
 });
+
+server.get('/api/contact', (req, res) => {
+  res
+    .status(200)
+    .send('<div><h1>Contact</h1><input placeholder="email" /></div>');
+});
+
+server.put('/api/users/:id', (req, res) => {
+  const { id } = req.params;
+  const { name, bio } = req.body;
+  const newUser = { name, bio };
+  if (!newUser) return res.status(422).send("No users were sent.");
+  db.update(id, newUser)
+    .then(user => res.status(200).json(user))
+    .catch(err => console.log(err))
+})
+
+server.delete('/api/users/:id', (req, res) => {
+  const { id } = req.params
+  if (!id) {
+    return res
+      .status(422)
+      .json({ errorMessage: "Please provide a proper id to delete." });
+  }
+  db.remove(id)
+    .then(removedUser => {
+      console.log(removedUser);
+      res.status(200).json(removedUser);
+    });
+    .catch(err => console.log(err));
+})
 
 // once the server is fully configured we can have it "listen" for connections on a particular "port"
 // the callback function passed as the second argument will run once when the server starts
