@@ -1,6 +1,6 @@
 // require the express npm module, needs to be added to the project using "yarn add" or "npm install"
 const express = require('express');
-const users = require('./data/db.js')
+const users = require('./data/db.js');
 
 // creates an express application using the express module
 const server = express();
@@ -14,6 +14,7 @@ server.get('/', (req, res) => {
   res.send('Hello World');
 });
 
+// ROUTE /hobbits
 server.get('/hobbits', (req, res) => {
   // route handler code here
   const hobbits = [
@@ -26,15 +27,40 @@ server.get('/hobbits', (req, res) => {
       name: 'Frodo Baggins',
     },
   ];
+  
   res.status(200).json(hobbits);
 });
 
+server.post('/hobbits', (req, res) => {
+  res.status(201).json({ url: '/hobbits', operation: 'POST' });
+}) // 201 means created
+
+server.put('/hobbits', (req, res) => {
+  res.status(200).json({ url: '/hobbits', operation: 'PUT' });
+}) // 200 means okay
+
+server.delete('/hobbits/:id', (req, res) => {
+  const { id } = req.params
+
+  res.status(204)
+    .json({
+      url: `/hobbits/${id}`,
+      operation: `DELETE for hobbit with id ${id}`
+    });
+    res.redirect('/hobbits')
+}) // 204 means no content
+
+// ROUTE /users
 server.get('/users', (req, res) => {
   users.find()
-    .then(data => res.send(data))
+    .then(users => {
+      console.log('\n** users**', users);
+      res.json(users);
+    })
     .catch(err => console.log(err))
 })
 
 // once the server is fully configured we can have it "listen" for connections on a particular "port"
 // the callback function passed as the second argument will run once when the server starts
-server.listen(8000, () => console.log('API running on port 8000'));
+const port = 8000;
+server.listen(port, () => console.log(`=== API running on port ${port} ===`));
