@@ -27,16 +27,6 @@ const hobbits = [
   },
 ];
 
-server.get('/hobbits', (req, res) => {
-  const sortField = req.query.sortby || 'id';
-
-  const response = hobbits.sort(
-    (a, b) => (a[sortField] < b[sortField] ? -1 : 1)
-  );
-  
-  res.status(200).json(response);
-});
-
 server.post('/hobbits', (req, res) => {
   const hobbit = req.body;
   let nextId = 3;
@@ -47,6 +37,16 @@ server.post('/hobbits', (req, res) => {
   res.status(201).json(hobbits);
 }) // 201 means created
 
+server.get('/hobbits', (req, res) => {
+  const sortField = req.query.sortby || 'id';
+
+  const response = hobbits.sort(
+    (a, b) => (a[sortField] < b[sortField] ? -1 : 1)
+  );
+  
+  res.status(200).json(response);
+});
+
 server.put('/hobbits/:id', (req, res) => {
   const hobbit = hobbits.find(hobbit => hobbit.id == req.params.id);
   if (!hobbit) {
@@ -54,18 +54,33 @@ server.put('/hobbits/:id', (req, res) => {
   } else {
     Object.assign(hobbit, req.body);
     res.status(200).json(hobbit);
-  }
-}) // 200 means okay
+  };
+});
+
+// server.delete('/hobbits/:id', (req, res) => {
+//   const id = req.params.id;
+//   res.status(200).json({
+//       url: `/hobbits/${id}`,
+//       operation: `DELETE for hobbit with id ${id}`
+//     });
+//     // res.redirect('/hobbits');
+// });
 
 server.delete('/hobbits/:id', (req, res) => {
-  const { id } = req.params
-  res.status(204)
-    .json({
-      url: `/hobbits/${id}`,
-      operation: `DELETE for hobbit with id ${id}`
-    });
-    res.redirect('/hobbits')
-}) // 204 means no content
+  const id = req.params.id;
+  // or we could destructure it like so: const { id } = req.params;
+
+  const hobbit = hobbits.find(hobbit => hobbit.id === parseInt(req.params.id));
+  if (!hobbit) return res.status(404).send('The hobbit to be deleted was not found.');
+
+  const index = hobbits.indexOf(hobbit)
+  hobbits.splice(index, 1);
+
+  res.status(200).json({
+    url: `/hobbits/${id}`,
+    operation: `DELETE for hobbit with id ${id}`,
+  });
+});
 
 // USERS ROUTES
 server.get('/users', (req, res) => {
@@ -74,8 +89,8 @@ server.get('/users', (req, res) => {
       console.log('\n** users**', users);
       res.status(200).json(users);
     })
-    .catch(err => console.log(err))
-})
+    .catch(err => console.log(err));
+});
 
 // once the server is fully configured we can have it "listen" for connections on a particular "port"
 // the callback function passed as the second argument will run once when the server starts
