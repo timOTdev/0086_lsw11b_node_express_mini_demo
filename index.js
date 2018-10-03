@@ -15,6 +15,13 @@ server.get('/', (req, res) => {
   res.send('Hello World');
 });
 
+// myLogger Middleware
+var myLogger = function (req, res, next) {
+  console.log('A request was made.')
+  next()
+}
+server.use(myLogger)
+
 // HOBBITS ROUTES
 const hobbits = [
   {
