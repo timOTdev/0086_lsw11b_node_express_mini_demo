@@ -134,9 +134,13 @@ server.delete('/api/users/:id', (req, res) => {
     .then(removedUser => {
       console.log(removedUser);
       res.status(200).json(removedUser);
-    });
+    })
     .catch(err => console.log(err));
 })
+
+server.use(function(req, res) {
+  res.status(404).send("The page was not found, perhaps try another address? 👍");
+});
 
 // once the server is fully configured we can have it "listen" for connections on a particular "port"
 // the callback function passed as the second argument will run once when the server starts
