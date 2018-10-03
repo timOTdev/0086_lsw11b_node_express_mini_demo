@@ -22,6 +22,14 @@ var myLogger = function (req, res, next) {
 }
 server.use(myLogger)
 
+// requestTime Middleware
+var requestTime = function (req, res, next) {
+  req.requestTime = Date.now()
+  next()
+}
+
+server.use(requestTime)
+
 // HOBBITS ROUTES
 const hobbits = [
   {
@@ -38,9 +46,7 @@ server.post('/hobbits', (req, res) => {
   const hobbit = req.body;
   let nextId = 3;
   hobbit.id = nextId++;
-
-  hobbits.push(hobbit)
-
+  hobbits.push(hobbit);
   res.status(201).json(hobbits);
 }) // 201 means created
 
@@ -108,6 +114,7 @@ server.post('/api/users', (req, res) => {
 server.get('/api/users', (req, res) => {
   users.find()
     .then(users => {
+      console.log(req.requestTime)
       console.log('\n** users**', users);
       res.status(200).json(users);
     })
