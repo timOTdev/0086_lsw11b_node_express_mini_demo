@@ -1,4 +1,6 @@
-# Building RESTful APIs with Node.js and Express Mini
+# 0086_lsw11b_node_express_mini_demo
+
+## Building RESTful APIs with Node.js and Express Mini
 
 ## Topics
 
